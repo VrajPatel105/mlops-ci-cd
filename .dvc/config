@@ -1,0 +1,4 @@
+[core]
+    remote = mlops-mini-project-storage
+['remote "mlops-mini-project-storage"']
+    url = ../C:UsersvrajpAppDataLocalTemp
