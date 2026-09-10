@@ -1,27 +1,28 @@
 # 5. ml pipeline : model evaluation final stage for ml pipeline
 
-import os
-import json
+import numpy as np
 import pandas as pd
 import pickle
+import json
+from sklearn.metrics import accuracy_score, precision_score, recall_score, roc_auc_score
 import logging
-
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import precision_score, recall_score, roc_auc_score
 import mlflow
+import mlflow.sklearn
 import dagshub
+import os
 
 dagshub.init(repo_owner='VrajPatel105', repo_name='mlflow-mini-project', mlflow=True)
 
 mlflow.set_tracking_uri("https://dagshub.com/VrajPatel105/mlflow-dagshub.mlflow")
 
+# logging configuration
 logger = logging.getLogger('model_evaluation')
 logger.setLevel('DEBUG')
 
 console_handler = logging.StreamHandler()
 console_handler.setLevel('DEBUG')
 
-file_handler = logging.FileHandler('errors.log')
+file_handler = logging.FileHandler('model_evaluation_errors.log')
 file_handler.setLevel('ERROR')
 
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -31,68 +32,78 @@ file_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
 
-
-def load_model(model_path: str):
-    """Load the trained model from a pickle file."""
+def load_model(file_path: str):
+    """Load the trained model from a file."""
     try:
-        with open(model_path, 'rb') as f:
-            model = pickle.load(f)
-        logger.debug('Model loaded from %s', model_path)
+        with open(file_path, 'rb') as file:
+            model = pickle.load(file)
+        logger.debug('Model loaded from %s', file_path)
         return model
-    except FileNotFoundError as e:
-        logger.error('Model file not found: %s', e)
+    except FileNotFoundError:
+        logger.error('File not found: %s', file_path)
         raise
-    except pickle.UnpicklingError as e:
-        logger.error('Error unpickling model: %s', e)
+    except Exception as e:
+        logger.error('Unexpected error occurred while loading the model: %s', e)
         raise
 
-
-def load_data(test_path: str):
-    """Load the featurized test data."""
+def load_data(file_path: str) -> pd.DataFrame:
+    """Load data from a CSV file."""
     try:
-        test_data = pd.read_csv(test_path)
-        X_test = test_data.iloc[:, :-1].values
-        y_test = test_data.iloc[:, -1].values
-        logger.debug('Test data loaded, shape: %s', test_data.shape)
-        return X_test, y_test
-    except FileNotFoundError as e:
-        logger.error('File not found: %s', e)
+        df = pd.read_csv(file_path)
+        logger.debug('Data loaded from %s', file_path)
+        return df
+    except pd.errors.ParserError as e:
+        logger.error('Failed to parse the CSV file: %s', e)
         raise
-    except pd.errors.EmptyDataError as e:
-        logger.error('Empty CSV file: %s', e)
+    except Exception as e:
+        logger.error('Unexpected error occurred while loading the data: %s', e)
         raise
 
-
-def evaluate_model(model, X_test, y_test) -> dict:
-    """Evaluate the model and return a metrics dict."""
+def evaluate_model(clf, X_test: np.ndarray, y_test: np.ndarray) -> dict:
+    """Evaluate the model and return the evaluation metrics."""
     try:
-        y_pred = model.predict(X_test)
-        y_prob = model.predict_proba(X_test)[:, 1]
+        y_pred = clf.predict(X_test)
+        y_pred_proba = clf.predict_proba(X_test)[:, 1]
+
+        accuracy = accuracy_score(y_test, y_pred)
+        precision = precision_score(y_test, y_pred)
+        recall = recall_score(y_test, y_pred)
+        auc = roc_auc_score(y_test, y_pred_proba)
 
         metrics_dict = {
-            "accuracy": accuracy_score(y_test, y_pred),
-            "precision": precision_score(y_test, y_pred),
-            "recall": recall_score(y_test, y_pred),
-            "roc_auc": roc_auc_score(y_test, y_prob)
+            'accuracy': accuracy,
+            'precision': precision,
+            'recall': recall,
+            'auc': auc
         }
-        logger.debug('Model evaluation completed: %s', metrics_dict)
+        logger.debug('Model evaluation metrics calculated')
         return metrics_dict
     except Exception as e:
         logger.error('Error during model evaluation: %s', e)
         raise
 
-
-def save_metrics(metrics_dict: dict, output_dir: str):
-    """Save the metrics dict to a json file."""
+def save_metrics(metrics: dict, file_path: str) -> None:
+    """Save the evaluation metrics to a JSON file."""
     try:
-        os.makedirs(output_dir, exist_ok=True)
-        with open(os.path.join(output_dir, "metrics.json"), "w") as f:
-            json.dump(metrics_dict, f, indent=4)
-        logger.debug('Metrics saved to %s', output_dir)
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path, 'w') as file:
+            json.dump(metrics, file, indent=4)
+        logger.debug('Metrics saved to %s', file_path)
     except Exception as e:
-        logger.error('Error saving metrics: %s', e)
+        logger.error('Error occurred while saving the metrics: %s', e)
         raise
 
+def save_model_info(run_id: str, model_path: str, file_path: str) -> None:
+    """Save the model run ID and path to a JSON file."""
+    try:
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        model_info = {'run_id': run_id, 'model_path': model_path}
+        with open(file_path, 'w') as file:
+            json.dump(model_info, file, indent=4)
+        logger.debug('Model info saved to %s', file_path)
+    except Exception as e:
+        logger.error('Error occurred while saving the model info: %s', e)
+        raise
 
 def main():
     mlflow.set_experiment("dvc-pipeline")
@@ -128,7 +139,7 @@ def main():
             mlflow.log_artifact('reports/metrics.json')
 
             # Log the model info file to MLflow
-            mlflow.log_artifact('reports/model_info.json')
+            mlflow.log_artifact('reports/experiment_info.json')
 
             # Log the evaluation errors log file to MLflow
             mlflow.log_artifact('model_evaluation_errors.log')

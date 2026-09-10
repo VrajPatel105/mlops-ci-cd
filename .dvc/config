@@ -1,4 +1,4 @@
 [core]
-    remote = mlops-mini-project-storage
-['remote "mlops-mini-project-storage"']
-    url = ../C:UsersvrajpAppDataLocalTemp
+    remote = vrajmlops
+['remote "vrajmlops"']
+    url = s3://amzn-vrajmlops
