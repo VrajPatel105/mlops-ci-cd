@@ -87,13 +87,13 @@ stages:
       isexec: true
     - path: src/model/model_evaluation.py
       hash: md5
-      md5: d67715f0f4f527d686d7fffc7dbfc787
-      size: 5518
+      md5: 1fc288c2f4c21ab54e2c7ead10991661
+      size: 5523
       isexec: true
     outs:
     - path: reports/experiment_info.json
       hash: md5
-      md5: 595e4913a20aeeb5a6730df77cad7146
+      md5: d0469db4d1da543edd8cf171494d9bbb
       size: 116
       isexec: true
     - path: reports/metrics.json
@@ -106,11 +106,11 @@ stages:
     deps:
     - path: reports/experiment_info.json
       hash: md5
-      md5: 595e4913a20aeeb5a6730df77cad7146
+      md5: d0469db4d1da543edd8cf171494d9bbb
       size: 116
       isexec: true
     - path: src/model/register_model.py
       hash: md5
-      md5: d69b81b31df4e7b17da7e2f798ee9255
-      size: 2427
+      md5: 7adbd227a3e62c6308f1f0b7188ea636
+      size: 2432
       isexec: true
