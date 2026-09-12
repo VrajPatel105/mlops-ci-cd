@@ -51,20 +51,20 @@ stages:
       isexec: true
     params:
       params.yaml:
-        feature_engineering.max_features: 3000
+        feature_engineering.max_features: 3500
     outs:
     - path: data/features
       hash: md5
-      md5: 9c1c2ba201de80b6af6a4fe43aa984ca.dir
-      size: 62342192
+      md5: b56123fbfa859ce29712f00186b1ea84.dir
+      size: 72721192
       nfiles: 2
   model_building:
     cmd: python src/model/model_building.py
     deps:
     - path: data/features
       hash: md5
-      md5: 9c1c2ba201de80b6af6a4fe43aa984ca.dir
-      size: 62342192
+      md5: b56123fbfa859ce29712f00186b1ea84.dir
+      size: 72721192
       nfiles: 2
     - path: src/model/model_building.py
       hash: md5
@@ -74,31 +74,31 @@ stages:
     outs:
     - path: models/model.pkl
       hash: md5
-      md5: f00f82817e016f2cf0a59a5419c9a280
-      size: 24665
+      md5: 44e063680e25d91b895cf3740c166219
+      size: 28665
       isexec: true
   model_evaluation:
     cmd: python src/model/model_evaluation.py
     deps:
     - path: models/model.pkl
       hash: md5
-      md5: f00f82817e016f2cf0a59a5419c9a280
-      size: 24665
+      md5: 44e063680e25d91b895cf3740c166219
+      size: 28665
       isexec: true
     - path: src/model/model_evaluation.py
       hash: md5
-      md5: b1cd7fddb16a1565729544c5387409b7
-      size: 5519
+      md5: d67715f0f4f527d686d7fffc7dbfc787
+      size: 5518
       isexec: true
     outs:
     - path: reports/experiment_info.json
       hash: md5
-      md5: b46678482fbf115638ea6ae409308fa6
+      md5: 595e4913a20aeeb5a6730df77cad7146
       size: 116
       isexec: true
     - path: reports/metrics.json
       hash: md5
-      md5: 8a869a48043b535951b1a1b094730e6d
+      md5: e56f87fa68213d7642aa76b0973eae4a
       size: 139
       isexec: true
   model_registration:
@@ -106,7 +106,7 @@ stages:
     deps:
     - path: reports/experiment_info.json
       hash: md5
-      md5: b46678482fbf115638ea6ae409308fa6
+      md5: 595e4913a20aeeb5a6730df77cad7146
       size: 116
       isexec: true
     - path: src/model/register_model.py

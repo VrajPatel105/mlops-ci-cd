@@ -114,7 +114,6 @@ def main():
             
             X_test = test_data.iloc[:, :-1].values
             y_test = test_data.iloc[:, -1].values
-
             metrics = evaluate_model(clf, X_test, y_test)
             
             save_metrics(metrics, 'reports/metrics.json')
