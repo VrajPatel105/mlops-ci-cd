@@ -14,6 +14,7 @@ import nltk
 import string
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
+import dagshub
 
 def lemmatization(text):
     """Lemmatize the text."""
@@ -43,7 +44,7 @@ def removing_punctuations(text):
     """Remove punctuations from the text."""
     text = re.sub('[%s]' % re.escape(string.punctuation), ' ', text)
     text = text.replace('؛', "")
-    text = re.sub('\s+', ' ', text).strip()
+    text = re.sub('\\s+', ' ', text).strip()
     return text
 
 def removing_urls(text):
@@ -67,21 +68,9 @@ def normalize_text(text):
 
     return text
 
+dagshub.init(repo_owner='VrajPatel105', repo_name='mlops-ci-cd', mlflow=True)
 
-# Set up DagsHub credentials for MLflow tracking
-dagshub_token = os.getenv("DAGSHUB_PAT")
-if not dagshub_token:
-    raise EnvironmentError("DAGSHUB_PAT environment variable is not set")
-
-os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
-os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
-
-dagshub_url = "https://dagshub.com"
-repo_owner = "VrajPatel105"
-repo_name = "mlops-ci-cd"
-
-# Set up MLflow tracking URI
-mlflow.set_tracking_uri(f'{dagshub_url}/{repo_owner}/{repo_name}.mlflow')
+mlflow.set_tracking_uri("https://dagshub.com/VrajPatel105/mlops-ci-cd.mlflow")
 
 app = Flask(__name__)
 
@@ -101,30 +90,28 @@ model = mlflow.pyfunc.load_model(model_uri)
 
 vectorizer = pickle.load(open('models/vectorizer.pkl','rb'))
 
-@app.route('/')
+@app.route("/")
 def home():
-    return render_template('index.html',result=None)
+    return render_template("index.html", result=None)
 
-@app.route('/predict', methods=['POST'])
+
+@app.route("/predict", methods=["POST"])
 def predict():
+    text = request.form["text"]
 
-    text = request.form['text']
-
-    # clean
     text = normalize_text(text)
 
-    # bow
     features = vectorizer.transform([text])
 
-    # Convert sparse matrix to DataFrame
-    features_df = pd.DataFrame.sparse.from_spmatrix(features)
-    features_df = pd.DataFrame(features.toarray(), columns=[str(i) for i in range(features.shape[1])])
+    features_df = pd.DataFrame(
+        features.toarray(),
+        columns=[str(i) for i in range(features.shape[1])]
+    )
 
-    # prediction
     result = model.predict(features_df)
 
-    # show
-    return render_template('index.html', result=result[0])
+    return render_template("index.html", result=result[0])
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
