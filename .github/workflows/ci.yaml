@@ -61,9 +61,9 @@ jobs:
       - name: Build Docker image
         if: success()
         run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/mlops-cicd-image:latest .
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/mlops-ci-workflow:latest .
 
       - name: Push Docker image to Docker Hub
         if: success()
         run: |
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/mlops-cicd-image:latest
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/mlops-ci-workflow:latest
