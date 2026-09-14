@@ -3,8 +3,7 @@ import mlflow
 import pickle
 import os
 import pandas as pd
-
-
+from pathlib import Path
 import numpy as np
 import pandas as pd
 import os
@@ -15,6 +14,8 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import dagshub
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+MODEL_DIR = BASE_DIR / "models"
 
 def lemmatization(text):
     """Lemmatize the text."""
@@ -114,7 +115,7 @@ model_uri = f'models:/{model_name}/{model_version}'
 model = mlflow.pyfunc.load_model(model_uri)
 
 
-with open("/app/models/vectorizer.pkl", "rb") as f:
+with open(MODEL_DIR / "vectorizer.pkl", "rb") as f:
     vectorizer = pickle.load(f)
 
 
