@@ -18,6 +18,7 @@ dagshub_url = "https://dagshub.com"
 repo_owner = "VrajPatel105"
 repo_name = "mlops-ci-cd"
 
+mlflow.set_tracking_uri(f'{dagshub_url}/{repo_owner}/{repo_name}.mlflow')
 
 # logging configuration
 logger = logging.getLogger('model_registration')
