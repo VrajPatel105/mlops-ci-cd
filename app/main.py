@@ -90,6 +90,12 @@ model = mlflow.pyfunc.load_model(model_uri)
 
 vectorizer = pickle.load(open('models/vectorizer.pkl','rb'))
 
+with open("models/model.pkl", "rb") as f:
+    clf = pickle.load(f)
+
+print("Model expects:", clf.n_features_in_)
+print("Vectorizer produces:", len(vectorizer.get_feature_names_out()))
+
 @app.route("/")
 def home():
     return render_template("index.html", result=None)

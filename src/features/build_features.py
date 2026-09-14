@@ -93,15 +93,16 @@ def apply_bow(train_data, test_data, max_features):
 
 
 def save_data(train_df, test_df, data_path: str):
-    """Save the featurized train/test data to csv."""
-    try:
-        os.makedirs(data_path, exist_ok=True)
-        train_df.to_csv(os.path.join(data_path, "train_bow.csv"))
-        test_df.to_csv(os.path.join(data_path, "test_bow.csv"))
-        logger.debug('Featurized data saved to %s', data_path)
-    except Exception as e:
-        logger.error('Error saving featurized data: %s', e)
-        raise
+    os.makedirs(data_path, exist_ok=True)
+
+    train_df.to_csv(
+        os.path.join(data_path, "train_bow.csv"),
+        index=False,
+    )
+    test_df.to_csv(
+        os.path.join(data_path, "test_bow.csv"),
+        index=False,
+    )
 
 
 def main():
