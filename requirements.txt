@@ -64,7 +64,7 @@ multidict==6.8.0
 mypy_extensions==1.1.0
 narwhals==2.26.0
 nltk==3.10.3
-numpy==2.5.3
+numpy==2.2.3
 opentelemetry-api==1.44.0
 opentelemetry-proto==1.44.0
 opentelemetry-sdk==1.44.0
