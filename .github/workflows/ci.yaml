@@ -67,6 +67,6 @@ jobs :
           docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/mlops-cicd-image:latest
         
       - name: Push Docker image to Docker Hub
-        if success():
-          run: |
-            docker push ${{ secrets.DOCKER_HUB_USERNAME }}/mlops-cicd-image:latest
+        if success()
+        run: |
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/mlops-cicd-image:latest
