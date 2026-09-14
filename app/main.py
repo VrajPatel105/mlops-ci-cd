@@ -114,7 +114,7 @@ model_uri = f'models:/{model_name}/{model_version}'
 model = mlflow.pyfunc.load_model(model_uri)
 
 
-with open("/docker_app/models/vectorizer.pkl", "rb") as f:
+with open("/app/models/vectorizer.pkl", "rb") as f:
     vectorizer = pickle.load(f)
 
 
