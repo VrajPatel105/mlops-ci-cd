@@ -56,7 +56,6 @@ Mako==1.4.1
 markdown-it-py==4.2.0
 MarkupSafe==3.0.3
 marshmallow==3.26.2
-matplotlib==3.11.2
 mdurl==0.1.2
 mlflow==3.16.0
 mlflow-skinny==3.16.0
